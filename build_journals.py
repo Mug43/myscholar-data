@@ -95,8 +95,8 @@ def rank_score(label: str) -> float:
     if m_if:
         return 100.0 + float(m_if.group(1))
 
-    # 中科院 1~4 区
-    m_cas = re.search(r"中科院\s*([1-4])\s*区", label)
+    # 中科院 / SCI升级版 1~4 区
+    m_cas = re.search(r"(?:中科院|升级版|SJR)\D*([1-4])\s*区", label, re.IGNORECASE)
     if m_cas:
         return 50.0 - int(m_cas.group(1)) * 10.0
 
@@ -270,20 +270,31 @@ def load_scimago(path: Path, builder: DatasetBuilder) -> None:
     df = read_table(path)
     title_col = find_col(list(df.columns), ["Title", "Journal", "Journal Title", "Source title"])
     q_col = find_col(list(df.columns), ["SJR Best Quartile", "Quartile", "SJR Quartile"])
+    cites_col = find_col(list(df.columns), ["Citations / Doc. (2years)", "Cites / Doc. (2years)"])
     issn_col = find_col(list(df.columns), ["Issn", "ISSN"])
     if not title_col or not q_col:
         raise ValueError(f"无法识别 SCImago 列名，当前表头: {list(df.columns)}")
 
+    q_map = {"Q1": "1区", "Q2": "2区", "Q3": "3区", "Q4": "4区"}
     for _, row in df.iterrows():
         title = clean_text(row.get(title_col))
         q = clean_text(row.get(q_col)).upper()
-        if not title or q not in {"Q1", "Q2", "Q3", "Q4"}:
+        if not title or q not in q_map:
             if title and q in {"-", ""}:
                 continue
             builder.anomalies += 1
             continue
+        label = f"SJR {q_map[q]}"
+        if cites_col:
+            raw_c = clean_text(row.get(cites_col)).replace(",", ".")
+            try:
+                cv = float(raw_c)
+                if cv > 0:
+                    label = f"SJR {q_map[q]} · 均引{cv:.1f}"
+            except ValueError:
+                pass
         aliases = parse_issn_aliases(row.get(issn_col)) if issn_col else []
-        builder.add(title, f"SJR {q}", aliases)
+        builder.add(title, label, aliases)
 
 
 def load_plain_list(path: Path, builder: DatasetBuilder, default_label: str, title_candidates: list[str] | None = None) -> None:
@@ -541,20 +552,21 @@ def load_cas_json(
             for v in vals:
                 aliases.extend(parse_issn_aliases(v))
 
-        # 取大类最高分区（数字越小越优）
-        zones = [
-            int(p["zone"])
+        # 取大类最高分区（数字越小越优），并保留大类中文学科名（如：SCI升级版 材料科学3区）
+        placements = [
+            (int(p["zone"]), clean_text(p.get("category")))
             for p in (rec.get("majorPlacements") or [])
             if isinstance(p, dict) and str(p.get("zone", "")).isdigit()
         ]
-        if zones:
-            best_zone = min(zones)
+        if placements:
+            best_zone, best_cat = min(placements, key=lambda x: x[0])
             if 1 <= best_zone <= 4:
-                cas_up.add(title, f"中科院{best_zone}区", aliases)
+                cat_part = f"{best_cat}" if best_cat else ""
+                cas_up.add(title, f"SCI升级版 {cat_part}{best_zone}区", aliases)
         if rec.get("isTop") is True:
-            cas_top.add(title, "TOP", aliases)
+            cas_top.add(title, "中科院TOP", aliases)
         if rec.get("isWarned") is True:
-            cas_warn.add(title, "预警", aliases)
+            cas_warn.add(title, "中科院预警", aliases)
 
 
 def find_first_existing(base_dir: Path, names: list[str]) -> Path | None:
@@ -621,7 +633,7 @@ def main() -> None:
     try_load("JCR 影响因子与分区", ["jcr.csv", "jcr.xlsx"], lambda p: load_jcr(p, builders["jcr"], builders["sci_if"]))
     try_load("中科院分区表(JSON)", ["cas_ranking.json"], lambda p: load_cas_json(p, builders["cas_up"], builders["cas_top"], builders["cas_warn"]))
     try_load("中科院分区表(表格)", ["cas.xlsx", "cas.csv"], lambda p: load_cas(p, builders["cas_up"], builders["cas_top"]))
-    try_load("中科院预警名单", ["cas_warning.txt", "cas_warning.csv", "cas_warning.xlsx"], lambda p: load_plain_list(p, builders["cas_warn"], "预警"))
+    try_load("中科院预警名单", ["cas_warning.txt", "cas_warning.csv", "cas_warning.xlsx"], lambda p: load_plain_list(p, builders["cas_warn"], "中科院预警"))
 
     # 汇总结果
     private_datasets: dict[str, dict[str, Any]] = {}

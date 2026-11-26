@@ -1,9 +1,9 @@
 # MyScholar 期刊数据构建报告 (2026-11-26)
 
 ## 1. 输出文件概览
-- `my_journals.json`（公开版，不含 JCR/中科院分区）：**2659.0 KB**，共 90897 条
-- `my_journals.private.json`（私有版，含全部数据集）：**4919.2 KB**，共 156175 条
-- `my_journals.min.json`（精简公开版，仅 core + custom 分组）：**172.7 KB**，共 4518 条
+- `my_journals.json`（公开版，不含 JCR/中科院分区）：**3840.5 KB**，共 90897 条
+- `my_journals.private.json`（私有版，含全部数据集）：**6912.8 KB**，共 156175 条
+- `my_journals.min.json`（精简公开版，仅 core + custom 分组）：**172.8 KB**，共 4518 条
 
 ## 2. 各数据集统计
 | ID | 名称 | 分组 | 条数(含别名) | 别名数 | 冲突数 | 异常行数 | 仅私有版 |
@@ -61,29 +61,29 @@
 ### `cas_up` - SCI (中科院升级版)（共 60222 条）
 | 刊名 / 别名 | 标签 |
 | --- | --- |
-| 20 Et 21-Revue D Histoire | `中科院4区` |
-| 2D Materials | `中科院3区` |
-| 3 Biotech | `中科院4区` |
-| 3C Empresa | `中科院4区` |
-| 3c Tecnologia | `中科院4区` |
+| 20 Et 21-Revue D Histoire | `SCI升级版 历史学4区` |
+| 2D Materials | `SCI升级版 材料科学3区` |
+| 3 Biotech | `SCI升级版 生物学4区` |
+| 3C Empresa | `SCI升级版 管理学4区` |
+| 3c Tecnologia | `SCI升级版 工程技术4区` |
 
 ### `cas_top` - SCI中科院TOP期刊（共 5056 条）
 | 刊名 / 别名 | 标签 |
 | --- | --- |
-| ACADEMIC MEDICINE | `TOP` |
-| Academy of Management Annals | `TOP` |
-| ACADEMY OF MANAGEMENT JOURNAL | `TOP` |
-| ACADEMY OF MANAGEMENT REVIEW | `TOP` |
-| ACCIDENT ANALYSIS AND PREVENTION | `TOP` |
+| ACADEMIC MEDICINE | `中科院TOP` |
+| Academy of Management Annals | `中科院TOP` |
+| ACADEMY OF MANAGEMENT JOURNAL | `中科院TOP` |
+| ACADEMY OF MANAGEMENT REVIEW | `中科院TOP` |
+| ACCIDENT ANALYSIS AND PREVENTION | `中科院TOP` |
 
 ### `cas_warn` - SCI (中科院预警)（共 14 条）
 | 刊名 / 别名 | 标签 |
 | --- | --- |
-| COMPUTERS & ELECTRICAL ENGINEERING | `预警` |
-| NATURAL RESOURCES FORUM | `预警` |
-| NUMERICAL HEAT TRANSFER PART A-APPLICATIONS | `预警` |
-| Scalable Computing-Practice and Experience | `预警` |
-| WIRELESS PERSONAL COMMUNICATIONS | `预警` |
+| COMPUTERS & ELECTRICAL ENGINEERING | `中科院预警` |
+| NATURAL RESOURCES FORUM | `中科院预警` |
+| NUMERICAL HEAT TRANSFER PART A-APPLICATIONS | `中科院预警` |
+| Scalable Computing-Practice and Experience | `中科院预警` |
+| WIRELESS PERSONAL COMMUNICATIONS | `中科院预警` |
 
 ### `ccf` - 中国计算机学会(CCF)（共 1450 条）
 | 刊名 / 别名 | 标签 |
@@ -151,8 +151,8 @@
 ### `sjr` - SCImago (SJR)（共 82911 条）
 | 刊名 / 别名 | 标签 |
 | --- | --- |
-| Ca-A Cancer Journal for Clinicians | `SJR Q1` |
-| Nature Reviews Molecular Cell Biology | `SJR Q1` |
-| Quarterly Journal of Economics | `SJR Q1` |
-| Nature Reviews Drug Discovery | `SJR Q1` |
-| Nature Reviews Clinical Oncology | `SJR Q1` |
+| Ca-A Cancer Journal for Clinicians | `SJR 1区 · 均引285.6` |
+| Nature Reviews Molecular Cell Biology | `SJR 1区 · 均引45.2` |
+| Quarterly Journal of Economics | `SJR 1区 · 均引17.3` |
+| Nature Reviews Drug Discovery | `SJR 1区 · 均引15.3` |
+| Nature Reviews Clinical Oncology | `SJR 1区 · 均引36.5` |

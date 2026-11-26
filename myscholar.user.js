@@ -65,8 +65,8 @@
   const DEFAULT_CONFIG = {
     enabled: {
       cas_up: true, cas_top: true, cas_warn: true, sci_if: true, jcr: true,
-      ccf: true, pku: true, cssci: true, cscd: true, ft50: true, utd24: true,
-      fms: true, abs: true, custom_school: true
+      ei: true, ccf: true, pku: true, cssci: true, cscd: true, cstpcd: true,
+      sjr: true, ft50: true, utd24: true, fms: true, abs: true, custom_school: true
     },
     style: "soft",
     enableOpenAlex: true,
@@ -466,13 +466,13 @@
               const c2 = hit.summary_stats["2yr_mean_citedness"];
               const h = hit.summary_stats["h_index"];
               if (typeof c2 === "number" && c2 > 0) {
-                tags.push({ dsName: "OpenAlex", text: `OA-IF≈${c2.toFixed(1)}`, color: "#455a64" });
+                tags.push({ dsName: "OpenAlex", text: `近似IF ${c2.toFixed(1)}`, color: "#455a64" });
               }
               if (typeof h === "number" && h > 0) {
-                tags.push({ dsName: "OpenAlex", text: `H:${h}`, color: "#607d8b" });
+                tags.push({ dsName: "OpenAlex", text: `H指数:${h}`, color: "#607d8b" });
               }
               if (hit.is_oa) {
-                tags.push({ dsName: "OpenAlex", text: "OA", color: "#7b1fa2" });
+                tags.push({ dsName: "OpenAlex", text: "开源OA", color: "#7b1fa2" });
               }
             }
             oaCache[clean] = tags;
@@ -528,6 +528,15 @@
       border: 1px solid #e0e3e7;
       border-left: 3px solid var(--ms-c);
       border-radius: 3px;
+    }
+    .ms2-style-pastel .ms2-tag {
+      background-color: color-mix(in srgb, var(--ms-c) 26%, #ffffff);
+      color: #111111;
+      border: none;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 2px 10px;
     }
     .ms2-tag.ms2-warn {
       background-color: #111 !important;
@@ -595,16 +604,19 @@
     const localTags = queryLocalTags(venue);
     if (localTags.length > 0) {
       drawBadges(anchorEl, localTags, venue, pos);
-      return;
     }
 
-    // 2. 本地未命中 -> 尝试 OpenAlex 兜底
-    if (config.enableOpenAlex) {
+    // 2. 若开启 OpenAlex：本地未命中时全量兜底；已命中但缺少影响因子/均引指标时补充近似IF
+    const hasImpactMetric = localTags.some((t) => /IF|均引/i.test(t.text));
+    if (config.enableOpenAlex && (localTags.length === 0 || !hasImpactMetric)) {
       const oaTags = await queryOpenAlex(venue);
       if (anchorEl.dataset.ms2Venue === venue) {
-        drawBadges(anchorEl, oaTags, venue, pos);
+        const extra = localTags.length === 0
+          ? oaTags
+          : oaTags.filter((t) => t.text.startsWith("近似IF"));
+        drawBadges(anchorEl, [...localTags, ...extra], venue, pos);
       }
-    } else {
+    } else if (localTags.length === 0) {
       drawBadges(anchorEl, [], venue, pos);
     }
   }
@@ -978,7 +990,8 @@
     [
       { id: "classic", label: "样式一（经典）" },
       { id: "soft",    label: "样式二（柔和）" },
-      { id: "block",   label: "样式三（方块柔和）" }
+      { id: "block",   label: "样式三（方块柔和）" },
+      { id: "pastel",  label: "样式四（马卡龙胶囊）" }
     ].forEach((s) => {
       const b = document.createElement("button");
       b.className = `chip ${config.style === s.id ? "active" : ""}`;
