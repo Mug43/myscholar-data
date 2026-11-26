@@ -1,0 +1,17 @@
+# Do NOT push copyrighted / private files to public repo
+my_journals.private.json
+cas_ranking.json
+cas.xlsx
+cas.csv
+jcr.csv
+jcr.xlsx
+
+# Raw downloaded data files (re-fetchable via fetch_data.py)
+scimagojr.csv
+compendex.xlsx
+mjl_*.csv
+cn_core_raw.csv
+abs.xlsx
+ccf_cn.json
+__pycache__/
+*.pyc
